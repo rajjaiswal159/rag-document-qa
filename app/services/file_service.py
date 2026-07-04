@@ -1,6 +1,5 @@
 from pathlib import Path
 import shutil
-from fastapi import UploadFile, HTTPException
 import uuid
 from fastapi import UploadFile, HTTPException
 from app.utils.logger import logger
@@ -55,7 +54,7 @@ def save_pdf(file: UploadFile) -> Path:
         raise
 
     except Exception:
-        logger.exception("Failed to save uploaded file.")
+        logger.exception("Failed to save uploaded file: %s", file.filename)
     
         raise HTTPException(
             status_code=500,
