@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from app.config.settings import settings
 from app.services.document_processor import DocumentProcessor
 from app.services.vector_store import VectorStoreService
 
@@ -10,7 +10,7 @@ class IndexingService:
         self.processor = DocumentProcessor()
         self.vector_store = VectorStoreService()
 
-        self.vector_store_path = Path("data/vector_store")
+        self.vector_store_path = Path(settings.VECTOR_STORE_PATH)
 
     def index_document(self, pdf_path: str):
 

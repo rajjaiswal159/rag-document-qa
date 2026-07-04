@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     # Supported file types
     ALLOWED_EXTENSIONS: list[str] = ["pdf"]
 
+    VECTOR_STORE_PATH: str = "vector_store"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore"
