@@ -3,11 +3,12 @@ from app.exceptions import VectorStoreNotFoundError
 from app.schemas.question import QuestionRequest
 from app.services.qa_service import QAService
 from app.config.settings import settings
+from app.schemas.response import AnswerResponse
 
 router = APIRouter()
 
 
-@router.post("/ask")
+@router.post("/ask", response_model=AnswerResponse)
 def ask_question(request: QuestionRequest):
 
     try:
