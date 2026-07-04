@@ -1,5 +1,6 @@
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
+from pathlib import Path
 
 from app.config.settings import settings
 
@@ -32,3 +33,12 @@ class VectorStoreService:
             embeddings=self.embeddings,
             allow_dangerous_deserialization=True
         )
+    
+    def vector_store_exists(self, path: str) -> bool:
+        return Path(path).exists()
+    
+    def add_documents(self, vector_store, chunks):
+
+        vector_store.add_documents(chunks)
+    
+        return vector_store

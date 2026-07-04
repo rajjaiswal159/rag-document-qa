@@ -18,8 +18,23 @@ class IndexingService:
     
         chunks = self.processor.split_documents(documents)
     
-        vector_db = self.vector_store.create_vector_store(chunks)
-    
+        if self.vector_store.vector_store_exists(str(self.vector_store_path)):
+
+            vector_db = self.vector_store.load_vector_store(
+                str(self.vector_store_path)
+            )        
+
+            vector_db = self.vector_store.add_documents(
+                vector_db,
+                chunks
+            )        
+
+        else:        
+
+            vector_db = self.vector_store.create_vector_store(
+                chunks
+            )        
+
         self.vector_store.save_vector_store(
             vector_db,
             str(self.vector_store_path)
