@@ -22,26 +22,45 @@ class QAService:
         context = "\n\n".join(document.page_content for document in documents)
 
         prompt = f"""
-            You are an AI assistant for question answering.
-            
-            Use ONLY the information provided in the context below.
-            
-            If the answer is not present in the context, reply:
-            
-            "I couldn't find the answer in the uploaded documents."
-            
-            Context:
-            {context}
-            
-            Question:
-            {question}
-            
-            Answer:
-            """
+You are an AI assistant for answering questions from uploaded documents.
+
+Instructions:
+- Answer ONLY using the provided context.
+- If the answer is not present in the context, say:
+  "I couldn't find the answer in the uploaded documents."
+- Do not make up information.
+- Keep your answer clear and concise.
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:
+"""
         
         response = self.llm.invoke(prompt)
 
+        sources = []
+        seen = set()
+        
+        for document in documents:
+        
+            source = (
+                document.metadata.get("source"),
+                document.metadata.get("page")
+            )
+        
+            if source not in seen:
+                seen.add(source)
+        
+                sources.append({
+                    "source": source[0],
+                    "page": source[1]
+                })
+        
         return {
             "answer": response.content,
-            "documents": documents
+            "sources": sources
         }
