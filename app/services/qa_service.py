@@ -7,7 +7,7 @@ from app.services.retriever import Retriever
 class QAService:
 
     def __init__(self, vector_store_path: str):
-
+        # Initialize retriever and Gemini LLM
         self.retriever = Retriever(vector_store_path)
 
         self.llm = ChatGoogleGenerativeAI(
@@ -17,10 +17,15 @@ class QAService:
         )
 
     def answer_question(self, question: str):
-
+        # Retrieve relevant documents
         documents = self.retriever.retrieve(question)
-        context = "\n\n".join(document.page_content for document in documents)
 
+        # Combine retrieved documents into a single context
+        context = "\n\n".join(
+            document.page_content for document in documents
+        )
+
+        # Build the prompt for the LLM
         prompt = f"""
 You are an AI assistant for answering questions from uploaded documents.
 
@@ -39,27 +44,31 @@ Question:
 
 Answer:
 """
-        
-        response = self.llm.invoke(prompt)
 
+        # Generate an answer using Gemini
+        try:
+            response = self.llm.invoke(prompt)
+        except Exception as e:
+            raise RuntimeError(f"Failed to generate answer: {e}")
+
+        # Collect unique document sources
         sources = []
         seen = set()
-        
+
         for document in documents:
-        
             source = (
                 document.metadata.get("source"),
                 document.metadata.get("page")
             )
-        
+
             if source not in seen:
                 seen.add(source)
-        
+
                 sources.append({
                     "source": source[0],
                     "page": source[1]
                 })
-        
+
         return {
             "answer": response.content,
             "sources": sources

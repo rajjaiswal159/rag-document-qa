@@ -1,40 +1,44 @@
 from pathlib import Path
+
 from app.config.settings import settings
 from app.services.document_processor import DocumentProcessor
 from app.services.vector_store import VectorStoreService
 
+
 class IndexingService:
 
     def __init__(self):
-
+        # Initialize document processor and vector store service
         self.processor = DocumentProcessor()
         self.vector_store = VectorStoreService()
 
         self.vector_store_path = Path(settings.VECTOR_STORE_PATH)
 
     def index_document(self, pdf_path: str):
-
+        # Extract and split the uploaded PDF into chunks
         documents = self.processor.load_document(pdf_path)
-    
         chunks = self.processor.split_documents(documents)
-    
+
+        # Update the existing vector store if it exists
         if self.vector_store.vector_store_exists(str(self.vector_store_path)):
 
             vector_db = self.vector_store.load_vector_store(
                 str(self.vector_store_path)
-            )        
+            )
 
             vector_db = self.vector_store.add_documents(
                 vector_db,
                 chunks
-            )        
+            )
 
-        else:        
+        # Otherwise, create a new vector store
+        else:
 
             vector_db = self.vector_store.create_vector_store(
                 chunks
-            )        
+            )
 
+        # Save the updated vector store
         self.vector_store.save_vector_store(
             vector_db,
             str(self.vector_store_path)

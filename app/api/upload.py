@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from app.services.file_service import save_pdf
 from app.services.indexing_service import IndexingService
@@ -13,13 +13,30 @@ router = APIRouter(
 
 @router.post("/")
 def upload_pdf(file: UploadFile = File(...)):
-    
-    file_path = save_pdf(file)
+    try:
+        # Save the uploaded PDF
+        file_path = save_pdf(file)
 
-    indexing_service.index_document(str(file_path))
+        # Index the uploaded document
+        indexing_service.index_document(str(file_path))
 
-    return {
-        "message": "File uploaded successfully.",
-        "filename": file.filename,
-        "path": str(file_path)
-    }
+        return {
+            "message": "File uploaded successfully.",
+            "filename": file.filename
+        }
+
+    except HTTPException:
+        # Re-raise HTTP exceptions from lower layers
+        raise
+
+    except RuntimeError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+    except Exception:
+        raise HTTPException(
+            status_code=500,
+            detail="An unexpected error occurred."
+        )
