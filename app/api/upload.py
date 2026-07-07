@@ -34,3 +34,7 @@ def upload_pdf(file: UploadFile = File(...)):
             status_code=500,
             detail="An unexpected error occurred."
         )
+        
+    finally:
+        if file_path and file_path.exists():
+            file_path.unlink()
