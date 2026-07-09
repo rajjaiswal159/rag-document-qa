@@ -12,34 +12,27 @@ class IndexingService:
         self.processor = DocumentProcessor()
         self.vector_store = VectorStoreService()
 
-        self.vector_store_path = Path(settings.VECTOR_STORE_PATH)
+    def index_document(self, pdf_path: Path):
 
-    def index_document(self, pdf_path: str):
+        # Extract UUID from filename
+        document_id = pdf_path.stem
+
+        # Create vector store path for this document
+        vector_store_path = (
+            Path(settings.VECTOR_STORE_PATH) / document_id
+        )
+        
         # Extract and split the uploaded PDF into chunks
-        documents = self.processor.load_document(pdf_path)
+        documents = self.processor.load_document(str(pdf_path))
         chunks = self.processor.split_documents(documents)
 
-        # Update the existing vector store if it exists
-        if self.vector_store.vector_store_exists(str(self.vector_store_path)):
-
-            vector_db = self.vector_store.load_vector_store(
-                str(self.vector_store_path)
-            )
-
-            vector_db = self.vector_store.add_documents(
-                vector_db,
-                chunks
-            )
-
-        # Otherwise, create a new vector store
-        else:
-
-            vector_db = self.vector_store.create_vector_store(
-                chunks
-            )
+        # Create vector store
+        vector_db = self.vector_store.create_vector_store(chunks)
 
         # Save the updated vector store
         self.vector_store.save_vector_store(
             vector_db,
-            str(self.vector_store_path)
+            str(vector_store_path)
         )
+
+        return document_id

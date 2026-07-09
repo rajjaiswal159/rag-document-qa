@@ -1,14 +1,14 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
-
 from app.config.settings import settings
 from app.services.retriever import Retriever
+from app.utils.logger import logger
 
 
 class QAService:
 
-    def __init__(self, vector_store_path: str):
+    def __init__(self):
         # Initialize retriever and Gemini LLM
-        self.retriever = Retriever(vector_store_path)
+        self.retriever = Retriever()
 
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
@@ -16,9 +16,12 @@ class QAService:
             temperature=0
         )
 
-    def answer_question(self, question: str):
+    def answer_question(self, document_id: str, question: str):
         # Retrieve relevant documents
-        documents = self.retriever.retrieve(question)
+        documents = self.retriever.retrieve(
+            document_id,
+            question
+        )
 
         # Combine retrieved documents into a single context
         context = "\n\n".join(
@@ -48,8 +51,11 @@ Answer:
         # Generate an answer using Gemini
         try:
             response = self.llm.invoke(prompt)
-        except Exception as e:
-            raise RuntimeError(f"Failed to generate answer: {e}")
+        except Exception:
+
+            logger.exception("Failed to generate answer using Gemini.")
+
+            raise RuntimeError("Failed to generate answer.")
 
         # Collect unique document sources
         sources = []

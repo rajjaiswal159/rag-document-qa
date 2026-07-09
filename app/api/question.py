@@ -1,20 +1,26 @@
 from fastapi import APIRouter, HTTPException
-
 from app.config.settings import settings
 from app.schemas.question import QuestionRequest
 from app.schemas.response import AnswerResponse
 from app.services.qa_service import QAService
+from app.utils.logger import logger
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/ask",
+    tags=["ask"]
+)
 
-qa_service = QAService(settings.VECTOR_STORE_PATH)
+qa_service = QAService()
 
 
-@router.post("/ask", response_model=AnswerResponse)
+@router.post("/", response_model=AnswerResponse)
 def ask_question(request: QuestionRequest):
 
     try:
-        return qa_service.answer_question(request.question)
+        return qa_service.answer_question(
+            request.document_id,
+            request.question
+        )
 
     except FileNotFoundError as e:
         raise HTTPException(
@@ -23,6 +29,8 @@ def ask_question(request: QuestionRequest):
         )
 
     except Exception:
+        logger.exception("Unexpected error while processing question.")
+
         raise HTTPException(
             status_code=500,
             detail="Failed to process the question."

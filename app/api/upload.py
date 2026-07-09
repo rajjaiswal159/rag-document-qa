@@ -1,5 +1,5 @@
 from fastapi import APIRouter, File, HTTPException, UploadFile
-
+from app.utils.logger import logger
 from app.services.file_service import save_pdf
 from app.services.indexing_service import IndexingService
 
@@ -18,10 +18,11 @@ def upload_pdf(file: UploadFile = File(...)):
         file_path = save_pdf(file)
 
         # Index the uploaded document
-        indexing_service.index_document(str(file_path))
+        document_id = indexing_service.index_document(file_path)
 
         return {
             "message": "File uploaded successfully.",
+            "document_id": document_id,
             "filename": file.filename
         }
 
@@ -30,6 +31,8 @@ def upload_pdf(file: UploadFile = File(...)):
         raise
 
     except Exception:
+        logger.exception("Unexpected error during PDF upload.")
+
         raise HTTPException(
             status_code=500,
             detail="An unexpected error occurred."

@@ -15,11 +15,8 @@ class DocumentProcessor:
         # Initialize the PDF loader
         loader = PyPDFLoader(pdf_path)
 
-        try:
-            # Load all pages as LangChain Document objects
-            return loader.load()
-        except Exception as e:
-            raise RuntimeError(f"Failed to load PDF document: {e}")
+        # Load all pages as LangChain Document objects
+        return loader.load()
 
     def split_documents(self, documents):
         # Split documents into smaller overlapping chunks

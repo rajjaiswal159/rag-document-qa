@@ -12,7 +12,8 @@ class Settings(BaseSettings):
     ALLOWED_EXTENSIONS: list[str] = ["pdf"]
 
     # Directory for storing the FAISS vector store
-    VECTOR_STORE_PATH: str = "vector_store"
+    VECTOR_STORE_PATH: str = "data/vector_store"
+    SAVED_pdf_PATH: str = "data/uploads"
 
     # Load configuration from the .env file
     model_config = SettingsConfigDict(

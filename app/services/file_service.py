@@ -1,13 +1,11 @@
 from pathlib import Path
 import uuid
-
 from fastapi import UploadFile, HTTPException
-
 from app.config.settings import settings
 from app.utils.logger import logger
 
 # Directory for storing uploaded PDF files
-UPLOAD_DIR = Path("data/uploads")
+UPLOAD_DIR = Path(settings.SAVED_pdf_PATH)
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 

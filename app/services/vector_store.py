@@ -1,8 +1,6 @@
-from pathlib import Path
-
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
-
+from app.utils.logger import logger
 from app.config.settings import settings
 
 
@@ -16,35 +14,47 @@ class VectorStoreService:
         )
 
     def create_vector_store(self, chunks):
-        # Create a FAISS vector store from document chunks
-        return FAISS.from_documents(
-            documents=chunks,
-            embedding=self.embeddings
-        )
-
+        try:
+            return FAISS.from_documents(
+                documents=chunks,
+                embedding=self.embeddings
+            )
+    
+        except Exception:
+            logger.exception("Failed to create vector store.")
+    
+            raise RuntimeError("Failed to create vector store.")
+        
     def save_vector_store(self, vector_store, path: str):
         # Save the vector store to disk
         try:
             vector_store.save_local(path)
-        except Exception as e:
-            raise RuntimeError(f"Failed to save vector store: {e}")
+
+            logger.info(
+                "Vector store saved successfully at: %s",
+                path
+            )
+            
+        except Exception:
+            logger.exception(
+                "Failed to save vector store at: %s", 
+                path
+            )
+    
+            raise RuntimeError("Failed to save vector store.")
 
     def load_vector_store(self, path: str):
-        # Load the vector store from disk
         try:
             return FAISS.load_local(
                 folder_path=path,
                 embeddings=self.embeddings,
                 allow_dangerous_deserialization=True
             )
-        except Exception as e:
-            raise RuntimeError(f"Failed to load vector store: {e}")
-
-    def vector_store_exists(self, path: str) -> bool:
-        # Check whether the vector store exists
-        return Path(path).exists()
-
-    def add_documents(self, vector_store, chunks):
-        # Add new document chunks to the existing vector store
-        vector_store.add_documents(chunks)
-        return vector_store
+    
+        except Exception:
+            logger.exception(
+                "Failed to load vector store from: %s",
+                path
+            )
+    
+            raise RuntimeError("Failed to load vector store.")
