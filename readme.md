@@ -151,6 +151,7 @@ Example Response
 ```json
 {
   "message": "File uploaded successfully.",
+  "document_id": "f18c6b25-6c1d-4b6d-8b1e-3d9e7f4d2abc",
   "filename": "sample.pdf"
 }
 ```
@@ -169,6 +170,7 @@ Request
 
 ```json
 {
+  "document_id": "f18c6b25-6c1d-4b6d-8b1e-3d9e7f4d2abc",
   "question": "What is Retrieval-Augmented Generation?"
 }
 ```
@@ -196,12 +198,14 @@ Example Response
 3. Documents are split into overlapping chunks.
 4. Chunks are converted into embeddings using Gemini.
 5. Embeddings are stored in a FAISS vector database.
-6. When a question is asked:
-
+6. The API returns a unique document ID for the uploaded PDF.
+7. When a question is asked:
+   * The client provides the document ID and question.
+   * The corresponding FAISS vector store is loaded.
    * Relevant chunks are retrieved using similarity search.
    * Retrieved chunks are passed to Gemini as context.
    * Gemini generates an answer using only the provided context.
-7. The API returns the answer along with the source documents and page numbers.
+8. The API returns the answer along with the source documents and page numbers.
 
 ---
 
