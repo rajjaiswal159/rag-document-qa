@@ -4,5 +4,6 @@ __pycache__/
 
 data/uploads/
 data/vector_store/
+data/documents.db
 
 *.pyc

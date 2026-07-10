@@ -4,12 +4,14 @@ from app.schemas.question import QuestionRequest
 from app.schemas.response import AnswerResponse
 from app.services.qa_service import QAService
 from app.utils.logger import logger
+from app.services.cleanup_service import CleanupService
 
 router = APIRouter(
     prefix="/ask",
     tags=["ask"]
 )
 
+cleanup_service = CleanupService()
 qa_service = QAService()
 
 
@@ -17,6 +19,8 @@ qa_service = QAService()
 def ask_question(request: QuestionRequest):
 
     try:
+        cleanup_service.cleanup_expired()
+
         return qa_service.answer_question(
             request.document_id,
             request.question
