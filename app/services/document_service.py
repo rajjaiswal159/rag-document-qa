@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.db.models import Document
 from app.db.database import SessionLocal
 from datetime import datetime
+from app.utils.logger import logger
 
 
 class DocumentService:
@@ -27,6 +28,18 @@ class DocumentService:
     
             db.add(document)
             db.commit()
+
+        except Exception:
+            db.rollback()
+    
+            logger.exception(
+                "Failed to save document metadata: %s",
+                document_id
+            )
+    
+            raise RuntimeError(
+                "Failed to save document metadata."
+            )
     
         finally:
             db.close()
@@ -48,6 +61,19 @@ class DocumentService:
                 document.last_accessed = datetime.utcnow()
     
                 db.commit()
+
+
+        except Exception:
+            db.rollback()
+        
+            logger.exception(
+                "Failed to update last access time: %s",
+                document_id
+            )
+        
+            raise RuntimeError(
+                "Failed to update document metadata."
+            )
     
         finally:
             db.close()

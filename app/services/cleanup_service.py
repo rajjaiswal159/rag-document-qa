@@ -54,9 +54,14 @@ class CleanupService:
             db.commit()
 
         except Exception:
+            db.rollback()
+
             logger.exception(
-                "Failed to clean up document %s",
-                document.document_id
+                "Failed to clean up expired documents."
+            )
+        
+            raise RuntimeError(
+                "Failed to clean up expired documents."
             )
     
         finally:
