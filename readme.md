@@ -39,7 +39,7 @@ A production-style Retrieval-Augmented Generation (RAG) API built with **FastAPI
 ## 📁 Project Structure
 
 ```text
-│app/
+app/
 │
 ├── api/                 # FastAPI route handlers
 │   ├── upload.py
