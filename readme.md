@@ -6,34 +6,38 @@ A production-style Retrieval-Augmented Generation (RAG) API built with **FastAPI
 
 ## 🚀 Features
 
-* Upload PDF documents
-* Automatic document chunking
-* Gemini Embeddings for semantic search
-* FAISS vector database
-* Retrieval-Augmented Generation (RAG)
-* Source citations with page numbers
-* RESTful FastAPI endpoints
-* File validation and size limits
-* Structured project architecture
-* Logging and error handling
+- Upload PDF documents
+- Dedicated FAISS vector store for each uploaded document
+- Automatic document chunking
+- Google Gemini embeddings for semantic search
+- Retrieval-Augmented Generation (RAG)
+- Source citations with page numbers
+- SQLAlchemy + SQLite for document metadata management
+- Automatic cleanup of inactive documents and vector stores
+- RESTful FastAPI endpoints
+- File validation and configurable size limits
+- Structured service-based architecture
+- Logging and error handling
 
 ---
 
 ## 🛠️ Tech Stack
 
-* Python
-* FastAPI
-* LangChain
-* Google Gemini
-* FAISS
-* Pydantic Settings
-* Uvicorn
+- Python
+- FastAPI
+- LangChain
+- Google Gemini
+- FAISS
+- SQLAlchemy
+- SQLite
+- Pydantic Settings
+- Uvicorn
 
 ---
 
+
 ## 📁 Project Structure
 
-```text
 app/
 │
 ├── api/                 # FastAPI route handlers
@@ -43,23 +47,28 @@ app/
 ├── config/              # Application configuration
 │   └── settings.py
 │
+├── db/                  # SQLAlchemy database setup
+│   ├── database.py
+│   └── models.py
+│
 ├── schemas/             # Request and response models
 │   ├── question.py
-│   ├── response.py
+│   └── response.py
 │
 ├── services/            # Core business logic
+│   ├── cleanup_service.py
 │   ├── document_processor.py
+│   ├── document_service.py
 │   ├── file_service.py
 │   ├── indexing_service.py
 │   ├── qa_service.py
 │   ├── retriever.py
 │   └── vector_store.py
 │
-├── utils/               # Utility modules
+├── utils/
 │   └── logger.py
 │
-└── main.py              # FastAPI application entry point
-```
+└── main.py
 
 ---
 
@@ -193,30 +202,37 @@ Example Response
 
 ## 🔄 How It Works
 
-1. User uploads a PDF.
-2. The PDF is loaded using `PyPDFLoader`.
-3. Documents are split into overlapping chunks.
-4. Chunks are converted into embeddings using Gemini.
-5. Embeddings are stored in a FAISS vector database.
-6. The API returns a unique document ID for the uploaded PDF.
-7. When a question is asked:
-   * The client provides the document ID and question.
-   * The corresponding FAISS vector store is loaded.
-   * Relevant chunks are retrieved using similarity search.
-   * Retrieved chunks are passed to Gemini as context.
-   * Gemini generates an answer using only the provided context.
-8. The API returns the answer along with the source documents and page numbers.
+1. The user uploads a PDF document.
+2. The uploaded PDF is validated and temporarily stored.
+3. The document is loaded using `PyPDFLoader`.
+4. The text is split into overlapping chunks.
+5. Chunks are converted into Gemini embeddings.
+6. A dedicated FAISS vector store is created for the uploaded document.
+7. The vector store is saved using a unique document ID.
+8. Document metadata (filename, upload time and last accessed time) is stored in SQLite using SQLAlchemy.
+9. The API returns the generated document ID.
+10. When a question is submitted:
+    - The client sends the document ID and question.
+    - Expired documents are automatically cleaned up.
+    - The corresponding FAISS vector store is loaded.
+    - Relevant chunks are retrieved using similarity search.
+    - The document's last access time is updated.
+    - Gemini generates an answer using only the retrieved context.
+11. The API returns the answer along with source citations and page numbers.
 
 ---
 
 ## ✨ Key Highlights
 
-- Modular service-based architecture
-- Retrieval-Augmented Generation (RAG) pipeline
-- FAISS vector database for semantic search
+- Production-style Retrieval-Augmented Generation (RAG) pipeline
+- Dedicated FAISS vector store for every uploaded document
+- SQLAlchemy + SQLite metadata management
+- Automatic cleanup of inactive vector stores
+- Configurable document expiration
 - Google Gemini for embeddings and answer generation
 - Source citations with page numbers
-- RESTful API built with FastAPI
+- Modular service-based architecture
+- RESTful FastAPI API with structured logging and error handling
 
 ---
 
