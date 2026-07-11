@@ -44,7 +44,7 @@ app/
 │   ├── upload.py
 │   └── question.py
 │
-├── config/              # Application configuration
+├── config/             # Application configuration
 │   └── settings.py
 │
 ├── db/                  # SQLAlchemy database setup
