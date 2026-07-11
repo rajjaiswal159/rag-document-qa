@@ -38,6 +38,7 @@ A production-style Retrieval-Augmented Generation (RAG) API built with **FastAPI
 
 ## 📁 Project Structure
 
+```text
 │app/
 │
 ├── api/                 # FastAPI route handlers
@@ -69,7 +70,7 @@ A production-style Retrieval-Augmented Generation (RAG) API built with **FastAPI
 │   └── logger.py
 │
 └── main.py
-
+```
 ---
 
 ## ⚙️ Installation
